@@ -1,0 +1,7 @@
+ERROR:root: 
+Traceback (most recent call last):
+  File "C:/Users/Thomas/Documents/PyMyHome/listener.py", line 132, in <module>
+    main()
+  File "C:/Users/Thomas/Documents/PyMyHome/listener.py", line 100, in main
+    frm=sock_monitor.recv(1024)
+ConnectionAbortedError: [WinError 10053] Une connexion établie a été abandonnée par un logiciel de votre ordinateur hôte
