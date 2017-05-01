@@ -5,10 +5,11 @@ import urllib.request
 import datetime
 import time
 import logging
-
+import pprint
 
 def main():
-    host="192.168.1.39"
+    host="109.24.248.195"
+    #host="192.168.1.39"
     port=20000
 
     verbose=True
@@ -71,14 +72,16 @@ def main():
         if verbose: print("Gateway response: ",sock_command.recv(2048))
     #init_command_socket()
 
+    if verbose: print("Initializing COMMAND socket on ", host, ":", port)
+    sock_command = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock_command.connect((host, port))
+    if verbose: print("Gateway response: ",sock_command.recv(2048))
+    if verbose: print("Sending COMMAND Session: *99*0##")
+    sock_command.send(b'*99*0##')
+    if verbose: print("Gateway response: ",sock_command.recv(2048))
+
     def send_frames(framelist):
-        if verbose: print("Initializing COMMAND socket on ", host, ":", port)
-        sock_command = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock_command.connect((host, port))
-        if verbose: print("Gateway response: ",sock_command.recv(2048))
-        if verbose: print("Sending COMMAND Session: *99*0##")
-        sock_command.send(b'*99*0##')
-        if verbose: print("Gateway response: ",sock_command.recv(2048))
+
         for frame in framelist.split(frame_separator):
             frame=frame.encode("utf-8")
             if verbose: print("Sending Frame: ", frame)
@@ -88,7 +91,7 @@ def main():
                 print("Gateway response: ",sock_command.recv(2048))
             else:
                 sock_command.recv(2048)
-        sock_command.close()
+    #sock_command.close()
 
     #Si la liste Trigger a un élément Startup et si la trame n'est pas vide, exécuter les trames de startup
     print('STARTUP' in triggers.keys())
@@ -101,8 +104,13 @@ def main():
         frm=frm.decode("utf-8")
         if verbose: print("MONITOR :", frm)
         if frm in triggers.keys(): #Si le frame est un trigger de la liste: eg interrupteur 15, bouton HD
+            
+            if verbose: print("TRIGGER FRAME RECOGNIZED: ", frm)
+            
 
             ambiance=triggers[frm][0] #Récupérer l'ambiance correspondante, eg Salon / Dîner
+            pprint.pprint(triggers[frm])
+            if verbose: print("CORRESPONDING AMBIANCE: ", ambiance)
 
             if ambiance.find("LIGHTS")>=0: #Traite le tag LIGHTS pour le remplacer par All On ou Low light selon l'heure du jour ou de la nuit
                 h=datetime.datetime.now().hour
@@ -113,11 +121,11 @@ def main():
 
             if verbose: print("TRIGGERED: ", ambiance)
             frames = ambiances[ambiance] # Récupère la liste de frames à exécuter, eg *1*2*32##;*1*0*31##;*1*10*33##;*1*0*34##;*1*0*18##;*1*0*19##;*1*0*17##;*1*0*24##;*1*4*21##;*1*0*25##
-            if verbose: print(triggers[frm])
+            #if verbose: print(triggers[frm])
             if ambiances[ambiance]!= '': send_frames(ambiances[ambiance]) #Exécuter la liste de frames
 
 
-            if verbose: print(triggers[frm])
+            #if verbose: print(triggers[frm])
             if triggers[frm][1]!= "": send_frames(triggers[frm][1])
             pyCode=triggers[frm][1]
 
@@ -128,8 +136,8 @@ def main():
 
 logging.basicConfig(level=logging.DEBUG, filename=str(int(time.time()))+".txt")
 
-try:
-    main()
-except:
-    logging.exception(" ")
-    pass
+#try:
+main()
+#except:
+#    logging.exception(" ")
+#    pass
