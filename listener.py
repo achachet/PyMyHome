@@ -72,15 +72,15 @@ def main():
         if verbose: print("Gateway response: ",sock_command.recv(2048))
     #init_command_socket()
 
-    if verbose: print("Initializing COMMAND socket on ", host, ":", port)
-    sock_command = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_command.connect((host, port))
-    if verbose: print("Gateway response: ",sock_command.recv(2048))
-    if verbose: print("Sending COMMAND Session: *99*0##")
-    sock_command.send(b'*99*0##')
-    if verbose: print("Gateway response: ",sock_command.recv(2048))
 
     def send_frames(framelist):
+        if verbose: print("Initializing COMMAND socket on ", host, ":", port)
+        sock_command = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock_command.connect((host, port))
+        if verbose: print("Gateway response: ",sock_command.recv(2048))
+        if verbose: print("Sending COMMAND Session: *99*0##")
+        sock_command.send(b'*99*0##')
+        if verbose: print("Gateway response: ",sock_command.recv(2048))
 
         for frame in framelist.split(frame_separator):
             frame=frame.encode("utf-8")
@@ -134,7 +134,7 @@ def main():
 
     sock_monitor.close()
 
-logging.basicConfig(level=logging.DEBUG, filename=str(int(time.time()))+".txt")
+#logging.basicConfig(level=logging.DEBUG, filename=str(int(time.time()))+".txt")
 
 #try:
 main()
